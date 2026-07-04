@@ -38,7 +38,7 @@ automations, and receive incoming messages as a Home Assistant event.
 ## Installation (HACS)
 
 1. HACS → three-dot menu → **Custom repositories**.
-2. Add `https://github.com/NiklasM-foss/homeassistant-openwa` with category
+2. Add `https://github.com/NiklasM-foss/ha-openwa` with category
    **Integration**.
 3. Install **OpenWA (WhatsApp)**, then restart Home Assistant.
 4. Settings → Devices & Services → **Add Integration** → search **OpenWA**.
