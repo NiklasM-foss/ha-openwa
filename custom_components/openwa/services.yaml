@@ -1,0 +1,32 @@
+send_message:
+  name: Send WhatsApp message
+  description: Send a WhatsApp text message through OpenWA.
+  fields:
+    to:
+      name: To
+      required: true
+      example: "4915233535738"
+      description: >-
+        Recipient phone number in international format without "+"
+        (e.g. 4915233535738), or a full chat id such as 12345@c.us
+        for a contact or 12345@g.us for a group.
+      selector:
+        text:
+    message:
+      name: Message
+      required: true
+      example: "Hello from Home Assistant"
+      description: The text to send.
+      selector:
+        text:
+          multiline: true
+    entry_id:
+      name: Account
+      required: false
+      description: >-
+        Which OpenWA account to use. Only needed if you have configured
+        more than one OpenWA integration.
+      advanced: true
+      selector:
+        config_entry:
+          integration: openwa

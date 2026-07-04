@@ -1,0 +1,68 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to OpenWA",
+        "description": "Enter the URL of your OpenWA server and an API key (the API master key or a key you created in the OpenWA dashboard).",
+        "data": {
+          "base_url": "OpenWA URL",
+          "api_key": "API key"
+        },
+        "data_description": {
+          "base_url": "For example http://192.168.1.10:2785",
+          "api_key": "Sent as the x-api-key header"
+        }
+      },
+      "session": {
+        "title": "Choose WhatsApp session",
+        "description": "Select which linked WhatsApp session this integration should use.",
+        "data": {
+          "session_id": "Session"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to OpenWA. Check the URL and that the server is reachable.",
+      "invalid_auth": "Invalid API key.",
+      "no_sessions": "No WhatsApp session found. Link a device in the OpenWA dashboard first.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This WhatsApp session is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "OpenWA options",
+        "description": "Set a default recipient to expose a notify entity that always sends to that number.",
+        "data": {
+          "default_recipient": "Default recipient"
+        },
+        "data_description": {
+          "default_recipient": "Phone number without + (e.g. 4915233535738) or a full chat id. Leave empty to disable the notify entity."
+        }
+      }
+    }
+  },
+  "services": {
+    "send_message": {
+      "name": "Send WhatsApp message",
+      "description": "Send a WhatsApp text message through OpenWA.",
+      "fields": {
+        "to": {
+          "name": "To",
+          "description": "Recipient number in international format without + (e.g. 4915233535738) or a full chat id (12345@c.us / 12345@g.us)."
+        },
+        "message": {
+          "name": "Message",
+          "description": "The text to send."
+        },
+        "entry_id": {
+          "name": "Account",
+          "description": "Which OpenWA account to use (only needed with more than one)."
+        }
+      }
+    }
+  }
+}

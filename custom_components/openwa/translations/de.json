@@ -1,0 +1,68 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Mit OpenWA verbinden",
+        "description": "URL deines OpenWA-Servers und einen API-Key eingeben (den API-Master-Key oder einen im OpenWA-Dashboard erstellten Key).",
+        "data": {
+          "base_url": "OpenWA-URL",
+          "api_key": "API-Key"
+        },
+        "data_description": {
+          "base_url": "Zum Beispiel http://192.168.1.10:2785",
+          "api_key": "Wird als Header x-api-key gesendet"
+        }
+      },
+      "session": {
+        "title": "WhatsApp-Session wählen",
+        "description": "Wähle, welche verknüpfte WhatsApp-Session diese Integration nutzen soll.",
+        "data": {
+          "session_id": "Session"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zu OpenWA fehlgeschlagen. Prüfe URL und Erreichbarkeit.",
+      "invalid_auth": "Ungültiger API-Key.",
+      "no_sessions": "Keine WhatsApp-Session gefunden. Verknüpfe zuerst ein Gerät im OpenWA-Dashboard.",
+      "unknown": "Unerwarteter Fehler."
+    },
+    "abort": {
+      "already_configured": "Diese WhatsApp-Session ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "OpenWA-Optionen",
+        "description": "Lege einen Standard-Empfänger fest, um eine Notify-Entität bereitzustellen, die immer an diese Nummer sendet.",
+        "data": {
+          "default_recipient": "Standard-Empfänger"
+        },
+        "data_description": {
+          "default_recipient": "Nummer ohne + (z. B. 4915233535738) oder volle chatId. Leer lassen, um die Notify-Entität zu deaktivieren."
+        }
+      }
+    }
+  },
+  "services": {
+    "send_message": {
+      "name": "WhatsApp-Nachricht senden",
+      "description": "Sendet eine WhatsApp-Textnachricht über OpenWA.",
+      "fields": {
+        "to": {
+          "name": "An",
+          "description": "Empfängernummer international ohne + (z. B. 4915233535738) oder volle chatId (12345@c.us / 12345@g.us)."
+        },
+        "message": {
+          "name": "Nachricht",
+          "description": "Der zu sendende Text."
+        },
+        "entry_id": {
+          "name": "Konto",
+          "description": "Welches OpenWA-Konto genutzt wird (nur bei mehreren nötig)."
+        }
+      }
+    }
+  }
+}
