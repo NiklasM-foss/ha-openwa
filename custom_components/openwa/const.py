@@ -17,6 +17,7 @@ CONF_DEFAULT_RECIPIENT = "default_recipient"
 
 # Runtime data stored on hass.data[DOMAIN][entry_id]
 DATA_CLIENT = "client"
+DATA_COORDINATOR = "coordinator"
 DATA_OW_WEBHOOK_ID = "ow_webhook_id"
 DATA_UNSUB = "unsub"
 
@@ -33,3 +34,9 @@ ATTR_MESSAGE = "message"
 ATTR_ENTRY_ID = "entry_id"
 
 DEFAULT_TIMEOUT = 20
+
+# Seconds between polls of /api/sessions for the session state
+UPDATE_INTERVAL = 30
+
+# Session status reported by OpenWA that counts as "connected"
+STATUS_READY = "ready"

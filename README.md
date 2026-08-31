@@ -17,6 +17,9 @@ automations, and receive incoming messages as a Home Assistant event.
 - **Receive messages**: every incoming WhatsApp message fires the
   **`openwa_message`** event on the Home Assistant bus. The integration
   registers a Home Assistant webhook and subscribes OpenWA to it automatically.
+- **Session monitoring**: the state of the linked session (connected, phone
+  number, last activity, last error) as sensors, so a dropped link is visible
+  and can be alerted on instead of silently swallowing messages.
 
 ## Requirements
 
@@ -114,6 +117,54 @@ actions:
       message: "House is {{ states('climate.living_room') }}."
 ```
 
+## Session entities
+
+The integration polls `/api/sessions` every 30 seconds and exposes the state of
+the session it is bound to. All entities live on one device named after the
+config entry.
+
+| Entity | Type | Meaning |
+|---|---|---|
+| `binary_sensor.<name>_connection` | connectivity | **On** while the session status is `ready`. This is the one to alert on. |
+| `sensor.<name>_session_status` | text | Raw status: `ready`, `disconnected`, `initializing`, … Carries `session_id` and `session_name` as attributes. |
+| `sensor.<name>_phone_number` | text | The linked number, e.g. `4915233535738`. Diagnostic. |
+| `sensor.<name>_display_name` | text | WhatsApp display name of the linked account. Diagnostic. |
+| `sensor.<name>_connected_since` | timestamp | When the current link came up. |
+| `sensor.<name>_last_activity` | timestamp | Last traffic on the session. |
+| `sensor.<name>_session_created` | timestamp | When the session was created in OpenWA. Diagnostic, disabled by default. |
+| `sensor.<name>_session_updated` | timestamp | Last change to the session record. Diagnostic, disabled by default. |
+| `sensor.<name>_last_error` | text | Last error OpenWA recorded, `unknown` when there is none. Diagnostic. |
+
+### Why this matters
+
+A session can go to `disconnected` on its own (phone offline for too long, a
+WhatsApp-side logout). Every send then fails with
+`HTTP 400: Session '<id>' is not active`, which is easy to miss if nothing
+watches for it. An automation on the connectivity sensor closes that gap:
+
+```yaml
+automation:
+  - alias: WhatsApp gateway disconnected
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.whatsapp_connection
+        to: "off"
+        for: "00:05:00"
+    actions:
+      - action: persistent_notification.create
+        data:
+          title: WhatsApp gateway down
+          message: >-
+            Session status: {{ state_attr('binary_sensor.whatsapp_connection',
+            'status') }}. Restart it in the OpenWA dashboard.
+```
+
+Restart the session in the OpenWA dashboard, or with:
+
+```bash
+curl -X POST -H "x-api-key: <key>"   http://<openwa-host>:2785/api/sessions/<session-id>/start
+```
+
 ## Notes
 
 - The integration binds to one WhatsApp **session id**. If you delete and
@@ -121,6 +172,8 @@ actions:
   point at the old session).
 - Incoming delivery uses a Home Assistant webhook with `local_only`, so OpenWA
   must reach HA over the local network.
+- If the session disappears from `/api/sessions` (deleted in the dashboard), the
+  session entities go unavailable rather than keeping a stale value.
 
 ## License
 

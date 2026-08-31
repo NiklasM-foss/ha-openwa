@@ -64,5 +64,38 @@
         }
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "status": {
+        "name": "Session status"
+      },
+      "phone": {
+        "name": "Phone number"
+      },
+      "push_name": {
+        "name": "Display name"
+      },
+      "connected_at": {
+        "name": "Connected since"
+      },
+      "last_active": {
+        "name": "Last activity"
+      },
+      "created_at": {
+        "name": "Session created"
+      },
+      "updated_at": {
+        "name": "Session updated"
+      },
+      "last_error": {
+        "name": "Last error"
+      }
+    },
+    "binary_sensor": {
+      "connection": {
+        "name": "Connection"
+      }
+    }
   }
 }

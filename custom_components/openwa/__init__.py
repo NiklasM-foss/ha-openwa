@@ -12,7 +12,7 @@ from homeassistant.components import persistent_notification, webhook
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall, callback
-from homeassistant.exceptions import ConfigEntryNotReady, HomeAssistantError
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.network import NoURLAvailableError, get_url
@@ -27,16 +27,22 @@ from .const import (
     CONF_SESSION_ID,
     CONF_WEBHOOK_ID,
     DATA_CLIENT,
+    DATA_COORDINATOR,
     DATA_OW_WEBHOOK_ID,
     DOMAIN,
     EVENT_MESSAGE,
     OW_EVENT_MESSAGE_RECEIVED,
     SERVICE_SEND_MESSAGE,
 )
+from .coordinator import OpenWaCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.NOTIFY]
+PLATFORMS: list[Platform] = [
+    Platform.BINARY_SENSOR,
+    Platform.NOTIFY,
+    Platform.SENSOR,
+]
 
 SEND_MESSAGE_SCHEMA = vol.Schema(
     {
@@ -65,16 +71,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
     session_id = entry.data[CONF_SESSION_ID]
 
-    # Verify the connection is alive so a dead server surfaces as "retry".
-    try:
-        await client.list_sessions()
-    except OpenWaError as err:
-        _LOGGER.warning("OpenWA not reachable during setup: %s", err)
-        raise ConfigEntryNotReady(str(err)) from err
+    # The first refresh doubles as the reachability check: a dead server or a
+    # session that no longer exists surfaces as "retry" instead of a broken
+    # entry with silent entities.
+    coordinator = OpenWaCoordinator(hass, entry, client, session_id)
+    await coordinator.async_config_entry_first_refresh()
 
     domain_data = hass.data.setdefault(DOMAIN, {})
     domain_data[entry.entry_id] = {
         DATA_CLIENT: client,
+        DATA_COORDINATOR: coordinator,
         CONF_SESSION_ID: session_id,
         DATA_OW_WEBHOOK_ID: None,
     }
