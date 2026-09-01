@@ -168,11 +168,20 @@ class OpenWaConfigFlow(ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Return the options flow."""
-        return OpenWaOptionsFlow()
+        return OpenWaOptionsFlow(config_entry)
 
 
 class OpenWaOptionsFlow(OptionsFlow):
     """Options: default recipient for the notify entity."""
+
+    def __init__(self, entry: ConfigEntry) -> None:
+        """Keep the entry ourselves.
+
+        Home Assistant only sets the ``config_entry`` property on options
+        flows from 2024.12 onwards, and assigning to it is deprecated on
+        newer versions, so the entry is stored under a private name.
+        """
+        self._entry = entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -184,7 +193,7 @@ class OpenWaOptionsFlow(OptionsFlow):
                 title="", data={CONF_DEFAULT_RECIPIENT: recipient}
             )
 
-        current = self.config_entry.options.get(CONF_DEFAULT_RECIPIENT, "")
+        current = self._entry.options.get(CONF_DEFAULT_RECIPIENT, "")
         schema = vol.Schema(
             {vol.Optional(CONF_DEFAULT_RECIPIENT, default=current): str}
         )
