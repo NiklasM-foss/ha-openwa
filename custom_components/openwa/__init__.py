@@ -155,19 +155,19 @@ async def _async_setup_incoming(
             _async_ssrf_notification(hass, base)
         return
 
-    hass.data[DOMAIN][entry.entry_id][DATA_OW_WEBHOOK_ID] = created.get("id")
+    hook_id = created.get("id")
+    hass.data[DOMAIN][entry.entry_id][DATA_OW_WEBHOOK_ID] = hook_id
 
+    # The id is captured here because hass.data is already cleared when the
+    # unload callbacks run; HA awaits the returned coroutine itself.
     async def _remove_ow_webhook() -> None:
-        hook_id = hass.data[DOMAIN][entry.entry_id][DATA_OW_WEBHOOK_ID]
         if hook_id:
             try:
                 await client.delete_webhook(session_id, hook_id)
             except OpenWaError as err:
                 _LOGGER.debug("Could not delete OpenWA webhook: %s", err)
 
-    entry.async_on_unload(
-        lambda: hass.async_create_task(_remove_ow_webhook())
-    )
+    entry.async_on_unload(_remove_ow_webhook)
 
 
 @callback

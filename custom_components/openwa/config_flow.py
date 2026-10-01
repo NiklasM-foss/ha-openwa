@@ -164,6 +164,56 @@ class OpenWaConfigFlow(ConfigFlow, domain=DOMAIN):
             },
         )
 
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Change URL or API key of an existing entry, keeping its session."""
+        entry = self._get_reconfigure_entry()
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            base_url = _normalise_url(user_input[CONF_BASE_URL])
+            # an empty key field keeps the stored key, so it never has to be shown
+            api_key = (user_input.get(CONF_API_KEY) or "").strip() or entry.data[
+                CONF_API_KEY
+            ]
+            client = OpenWaClient(
+                async_get_clientsession(self.hass), base_url, api_key
+            )
+            try:
+                sessions = await client.list_sessions()
+            except OpenWaAuthError:
+                errors["base"] = "invalid_auth"
+            except OpenWaConnectionError:
+                errors["base"] = "cannot_connect"
+            except OpenWaError:
+                errors["base"] = "unknown"
+            else:
+                session_id = entry.data[CONF_SESSION_ID]
+                if not any(s.get("id") == session_id for s in sessions):
+                    errors["base"] = "session_not_found"
+                else:
+                    return self.async_update_reload_and_abort(
+                        entry,
+                        unique_id=f"{base_url}::{session_id}",
+                        data_updates={
+                            CONF_BASE_URL: base_url,
+                            CONF_API_KEY: api_key,
+                        },
+                    )
+
+        schema = vol.Schema(
+            {
+                vol.Required(
+                    CONF_BASE_URL, default=entry.data[CONF_BASE_URL]
+                ): str,
+                vol.Optional(CONF_API_KEY, default=""): str,
+            }
+        )
+        return self.async_show_form(
+            step_id="reconfigure", data_schema=schema, errors=errors
+        )
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:

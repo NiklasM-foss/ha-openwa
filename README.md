@@ -69,6 +69,14 @@ session it is used directly; with several you get a second step to choose one.
 A config entry is bound to one URL plus session id, so the same session cannot
 be added twice, while several OpenWA accounts can be added side by side.
 
+### Changing the URL or API key
+
+If the OpenWA server moves to a new address, use **Reconfigure** on the
+integration entry (since 2.2.0). It asks for the new URL and optionally a new
+API key; leave the key empty to keep the current one. The flow checks that the
+linked session exists on the server, updates the entry and reloads it. Entities,
+automations and the `openwa_message` event keep working unchanged.
+
 ### Options
 
 The integration options offer a single setting:

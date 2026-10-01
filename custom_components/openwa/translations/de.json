@@ -19,16 +19,30 @@
         "data": {
           "session_id": "Session"
         }
+      },
+      "reconfigure": {
+        "title": "OpenWA-Verbindung ändern",
+        "description": "URL des OpenWA-Servers oder den API-Key ändern. Die verknüpfte WhatsApp-Session bleibt dieselbe.",
+        "data": {
+          "base_url": "OpenWA-URL",
+          "api_key": "API-Key"
+        },
+        "data_description": {
+          "base_url": "Zum Beispiel http://192.168.1.10:2785",
+          "api_key": "Leer lassen, um den bisherigen Key zu behalten"
+        }
       }
     },
     "error": {
       "cannot_connect": "Verbindung zu OpenWA fehlgeschlagen. Prüfe URL und Erreichbarkeit.",
       "invalid_auth": "Ungültiger API-Key.",
       "no_sessions": "Keine WhatsApp-Session gefunden. Verknüpfe zuerst ein Gerät im OpenWA-Dashboard.",
-      "unknown": "Unerwarteter Fehler."
+      "unknown": "Unerwarteter Fehler.",
+      "session_not_found": "Die verknüpfte WhatsApp-Session wurde auf diesem Server nicht gefunden."
     },
     "abort": {
-      "already_configured": "Diese WhatsApp-Session ist bereits eingerichtet."
+      "already_configured": "Diese WhatsApp-Session ist bereits eingerichtet.",
+      "reconfigure_successful": "Die Verbindung wurde aktualisiert."
     }
   },
   "options": {
